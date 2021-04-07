@@ -14,12 +14,26 @@ type User struct {
 	CreateTime time.Time `db:"create_time"`
 }
 
+func init() {
+	log.SetFlags(log.Lshortfile)
+}
+
 func main() {
 	dsn := "tcp://localhost:9000?database=default"
 	m, e := clickhousex.NewBaseModel(dsn, User{})
 	if e != nil {
-		log.Fatal(e)
+		log.Println(e)
+		return
 	}
 
-	fmt.Println(m)
+	vs, e := m.QueryWhere("id>1")
+	if e != nil {
+		log.Println(e)
+		return
+	}
+
+	data := vs.([]*User)
+	for _, v := range data {
+		fmt.Println(*v)
+	}
 }
