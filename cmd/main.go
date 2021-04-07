@@ -1,27 +1,25 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/StevenZack/clickhousex"
 )
 
+type User struct {
+	Id         uint      `db:"id"`
+	Name       string    `db:"name" index:""`
+	CreateTime time.Time `db:"create_time"`
+}
+
 func main() {
 	dsn := "tcp://localhost:9000?database=default"
-	pool, e := sql.Open("clickhouse", dsn)
+	m, e := clickhousex.NewBaseModel(dsn, User{})
 	if e != nil {
-		log.Println(e)
-		return
+		log.Fatal(e)
 	}
 
-	cs, e := clickhousex.DescTable(pool, "default", "user")
-	if e != nil {
-		log.Println(e)
-		return
-	}
-	for _,c:=range cs{
-		fmt.Println(c)
-	}
+	fmt.Println(m)
 }
